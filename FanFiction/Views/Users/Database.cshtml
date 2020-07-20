@@ -1,0 +1,84 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Linq 
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IEnumerable<Microsoft.AspNetCore.Components.Forms.InputCheckbox> IdList
+
+<script>function check(field) {
+        var flag = 0;
+            for (var i = 0; i < field.length; ++i) {
+                if (field[i].checked == 1)
+                    flag++;
+            }
+
+        for (var i = 0; i < field.length; ++i) {
+            if (flag >= 1)
+                field[i].checked = 0;
+            else {
+                field[i].checked = 1;
+            }
+        }
+
+    }</script>
+
+<form method="post">
+    <div id="toolbar" class="toolbar-fixed">
+        <div class="container">
+            <div class="text-center">
+                <button asp-action="Delete" type="submit" class="btn btn-danger" asp-controller="Users">
+                    Delete
+                </button>
+                <button asp-action="Block" type="submit" class="btn btn-danger" asp-controller="Users">
+                    Block
+                </button>
+                <button asp-action="Unblock" type="submit" class="btn btn-primary" asp-controller="Users">
+                    Unblock
+                </button>
+                <button asp-action="AddAdmin" type="submit" class="btn btn-primary" asp-controller="Users">
+                    Add Admin
+                </button>
+                <button asp-action="RemoveAdmin" type="submit" class="btn btn-danger" asp-controller="Users">
+                    Remove Admin
+                </button>
+            </div>
+        </div>
+    </div>
+    <div style="padding:60px 0px 60px 0px">
+        <p>
+            <h2 style="text-align:center">Registered Users</h2>
+        </p>
+        <table class="table">
+            <tr>
+                <th>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="fullCheckBox" onclick="check(IdList)">
+                        <label class="custom-control-label" for="fullCheckBox">Full</label>
+                    </div>
+                </th>
+                <th>Id</th>
+                <th>Login</th>
+                <th>Email</th>
+                <th>Logged in</th>
+                <th>Registered</th>
+                <th>Role</th>
+            </tr>
+            @foreach (var user in UserManager.Users)
+            {
+<tr>
+    <td>
+        <label><input name="IdList" type="checkbox" value="@user.Id" /></label>
+    </td>
+    <td>@user.Id</td>
+    <td> <a class="nav-link text-danger" asp-area="" asp-controller="Account" asp-action="UserAccount" asp-route-id="@user.Id">@user.UserName</a></td>
+    <td>@user.Email</td>
+    <td>@user.LastLoginDate</td>
+    <td>@user.RegisterDate</td>
+    <td>@await user.GetCurrentRole(UserManager)</td>
+</tr>}
+        </table>
+    </div>
+</form>
+
+
+
+

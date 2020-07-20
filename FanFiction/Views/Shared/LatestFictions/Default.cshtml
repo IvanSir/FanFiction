@@ -1,0 +1,11 @@
+﻿@model IEnumerable<FanFiction.Models.Fiction>
+<div class="last-articles">
+    <h4>Latest articles:</h4>
+    <ul class="list-unstyled last-articles-list">
+        @foreach (var fiction in Model)
+        {
+<li>
+    @Html.Partial("_FictionSummary", fiction)
+</li>}
+    </ul>
+</div>

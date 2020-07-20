@@ -1,0 +1,80 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model UserAccount
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignManager
+@inject IEnumerable<Microsoft.AspNetCore.Components.Forms.InputCheckbox> IdList
+@inject IEnumerable<Microsoft.AspNetCore.Components.Forms.InputCheckbox> userId
+@{
+    var current = UserManager.GetUserAsync(User).Result;
+}
+
+
+
+
+    <form method="post">
+        <h2>Name: @Model.UserToShow.UserName</h2>
+        <ul>
+            <il class="card-text">Email: @Model.UserToShow.Email</il>
+            <li class="card-text">Registered: @Model.UserToShow.RegisterDate</li>
+            <li class="card-text">Role: @await Model.UserToShow.GetCurrentRole(UserManager)</li>
+            <li class="card-text"> Number of fanfictions: @Model.UserToShow.Fictions.Count </li>
+
+        </ul>
+
+        @if (SignManager.IsSignedIn(User))
+        {
+
+
+            @if (UserManager.GetUserId(User) == Model.UserToShow.Id || UserManager.IsInRoleAsync(current, "Admin").Result)
+            {<button asp-action="Delete" type="submit" class="btn btn-danger" asp-controller="Fictions">
+                    Delete
+                </button>
+
+            }
+
+            @if (current.GetCurrentRole(UserManager).Result == "Admin" && UserManager.GetUserId(User) != Model.UserToShow.Id)
+            {
+                <a class="btn btn-success" asp-area="" asp-controller="Fictions" asp-action="CreateByAdmin" asp-all-route-data=@(new Dictionary<string, string>() { { "userId", Model.UserToShow.Id } })>CreateByAdmin</a>
+
+            }
+            else if (UserManager.GetUserId(User) == Model.UserToShow.Id)
+            {
+                <a class="btn btn-success" asp-area="" asp-controller="Fictions" asp-action="Create">Create</a>
+
+            }
+        }
+
+
+            <h3>
+                Fictions:
+            </h3>
+
+
+            @foreach (var fiction in Model.UserToShow.Fictions)
+            {
+
+                {
+                    <div>
+                        <h4>
+
+                            <label>
+                                @if (SignManager.IsSignedIn(User))
+                                {
+
+                                    @if (UserManager.GetUserId(User) == Model.UserToShow.Id || UserManager.IsInRoleAsync(current, "Admin").Result)
+                                    {<input name="IdList" type="checkbox" value="@fiction.Id" />}
+                                    }
+                                    <a asp-action="fiction" asp-controller="Fictions" asp-route-id="@fiction.Id">
+                                        @fiction.Name
+                                    </a>
+                                </label>
+
+                        </h4>
+
+                    </div>
+                }
+            }
+
+
+        </form>
+

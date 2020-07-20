@@ -1,0 +1,71 @@
+﻿
+@model CreateChapterModel
+@{ ViewBag.Title = "Create a Chapter"; }
+
+
+<div class="row">
+    <div class="col-md-4"> 
+        <form method="post" enctype="multipart/form-data" asp-action="Create">
+            <h4>Create a new Fan Fiction.</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Chapter.Title"></label>
+                <input asp-for="Chapter.Title" class="form-control" />
+                <span asp-validation-for="Chapter.Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image"></label>
+                <div class="custom-file">
+                    <input asp-for="Image" class="form-control custom-file-input" />
+                    <label class="custom-file-label">Choose file</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Chapter.ChapterText"></label>
+                <textarea id="description" asp-for="Chapter.ChapterText" class="form-control" style="margin: 0px; " rows="5" placeholder="Text"></textarea>
+                <style>
+                    textarea {
+                        resize: both;
+                        width: 700px;
+                        height: 300px;
+                    }
+                </style>
+                <span asp-validation-for="Chapter.ChapterText" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script>$(document).ready(function () {
+                    $('.custom-file-input').on("change", function () {
+                        var filename = $(this).val().split("\\").pop();
+                        $(this).next('.custom-file-label').html(filename);
+                    });
+                })</script>
+
+    <script>
+        Dropzone.autoDiscover = false;
+        var myDropzone = new Dropzone('#uploader', {
+            url: '/Chapters/UploadImage',
+            maxFilesize: 5,
+            maxFiles: 1,
+            uploadMultiple: false,
+            parallelUploads: 1,
+            acceptedFiles: "image/*",
+            autoProcessQueue: true,
+            init: function () {
+
+                var startUpload = document.getElementById("button");
+                myDropzone = this;
+                startUpload.addEventListener("click", function () {
+                    myDropzone.processQueue();
+                });
+                this.on("success", function () {
+                    myDropzone.options.autoProcessQueue = true;
+                });
+            }
+        });
+    </script>
+}

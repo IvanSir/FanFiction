@@ -1,0 +1,21 @@
+﻿@model FanFiction.Models.Fiction
+
+
+<div class="row article-summary">
+    <br />
+
+    <div class="col-md-4">
+        <p class="text-center">
+            <strong>  @Html.Raw(Model.Author.UserName)</strong>
+            @Model.UploadDate.ToString("dd MMM yyyy")
+        </p>
+    </div>
+    <div class="col-md-8">
+        <h4>
+            <a @*asp-action="Details" asp-route-id="@Model.Id"*@>@Model.Name</a>
+        </h4>
+        <blockquote>
+            <p>@Model.Description</p>
+        </blockquote>
+    </div>
+</div>

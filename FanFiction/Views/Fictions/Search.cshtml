@@ -1,0 +1,19 @@
+﻿@model SearchModel
+@{ ViewBag.Title = "Search"; }
+
+<h1>Result for: @Model.Words</h1>
+
+<div class="container">
+    <div class="card-group">
+        @{ foreach (var fiction in Model.Fictions)
+            {
+                <div>
+                    <h2>
+                        <a asp-action="Fiction" asp-controller="Fictions" asp-route-id="@fiction.Id">
+                            @fiction.Name
+                        </a>
+                    </h2>
+                    <p>@fiction.Genre</p>
+                </div> } }
+    </div>
+    </div>

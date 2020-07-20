@@ -1,0 +1,94 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model FanFiction.Models.Fiction
+@inject UserManager<ApplicationUser> userManager;
+@inject SignInManager<ApplicationUser> signManager;
+@{ ViewBag.Title = Model.Name;
+
+    var user = userManager.GetUserAsync(User).Result;
+
+}
+
+
+<h1>
+    @Model.Name
+</h1>
+
+@if (signManager.IsSignedIn(User))
+{
+
+    <table>
+        <tr>
+            <td>@Model.GetRating(userManager).Result</td>
+            @for (var i = 0; i < 5; i++)
+            {
+                <td>
+                    <form asp-action="RateFiction" asp-controller="Fictions" asp-all-route-data=@(new Dictionary<string, string> { { "fictionId", Model.Id }, { "rate", (i + 1).ToString() } })>
+                        <button type="submit" style="color: @(Model.Rating > i ? "#ffd700" : "#666666");background-color: inherit; border-width: 0; outline: none">☆</button>
+                    </form>
+                </td>
+            }
+        </tr>
+    </table>
+}
+else { 
+
+<table>
+    <tr>
+        <td>@Model.GetRating(userManager).Result</td>
+        @for (var i = 0; i < 5; i++)
+        {
+            <td>               
+                    <label type="submit" style="color: @(Model.Rating > i ? "#ffd700" : "#666666");background-color: inherit; border-width: 0; outline: none">☆</label>
+            </td>
+        }
+    </tr>
+</table>
+
+
+
+}
+
+
+    <h6 class="text-muted">
+        Created by <a class="card-link" href="~/user/@Model.Author.Id">@Model.Author.UserName</a>
+        @Model.UploadDate.ToShortDateString()
+    </h6>
+    <div>Description: @Model.Description </div>
+    <div>Genres: @Model.Genre </div>
+    <div>
+        Tags:
+        @foreach (var tag in Model.Tags)
+        {
+            @tag.Name
+        }
+    </div>
+
+    @if (signManager.IsSignedIn(User))
+    {
+
+        @if (user.Id == Model.Author.Id || user.GetCurrentRole(userManager).Result == "Admin")
+        {
+            <a asp-action="Create" asp-controller="Chapters" );>
+                Add Chapter
+            </a>
+        }
+    }
+
+    @if (Model.Chapters.Count == 0)
+    {<div>No chapters...</div>
+    }
+    else
+    {
+        <ol>
+            @foreach (var chapter in Model.Chapters.OrderBy(md => md.ChapterNumber))
+            {
+            <li>
+                <a asp-action="Chapter" asp-controller="Chapters" asp-route-id="@chapter.Id">
+                    @chapter.Title
+                </a>
+            </li>
+            }
+        </ol>
+    }
+
+

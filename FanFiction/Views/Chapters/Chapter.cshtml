@@ -1,0 +1,101 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject FanFiction.Services.IFictionRepository Fictions;
+@model FanFiction.Models.Chapter
+@inject UserManager<ApplicationUser> userManager;
+@inject SignInManager<ApplicationUser> signManager;
+@addTagHelper *, Westwind.AspNetCore.Markdown
+@{
+    ViewBag.Title = Model.Title;
+    var fiction = Fictions.GetById(Model.FictionId);
+
+    var user = userManager.GetUserAsync(User).Result;
+
+    var comments = Model.Comments.OrderBy(com => com.CommentDate).ToList();
+}
+
+
+<h1>
+    @Model.Title - @Model.Rating likes
+</h1>
+<img style="width: 60%; height: 50%" src="@Model.PictureURL" alt="Image for @Model.Title" />
+
+<p><markdown markdown="@Model.ChapterText"></markdown> </p>
+
+@if (signManager.IsSignedIn(User))
+{
+
+    @if (User.IsInRole("Unblocked") || User.IsInRole("Admin"))
+    {
+
+        @if (Model.Likers.Where(Like => Like.UserId == userManager.GetUserAsync(User).Result.Id).ToList().Count() == 0)
+        {
+            <form method="post">
+                <button type="submit" class="btn btn-success" asp-action="Like" asp-controller="Chapters" asp-all-route-data=@(new Dictionary<string, string>() { { "id", Model.Id } } )>Like</button>
+            </form>
+        }
+        else
+        {
+            <form method="post">
+                <button type="submit" class="btn btn-danger" asp-action="DisLike" asp-controller="Chapters" asp-all-route-data=@(new Dictionary<string, string>() { { "id", Model.Id } } )>DisLike</button>
+            </form>
+        }
+    }
+}
+
+@foreach (var chapter in fiction.Chapters.OrderBy(ch => ch.ChapterNumber))
+{
+    if (chapter.ChapterNumber == Model.ChapterNumber)
+    {
+        <label>@(chapter.ChapterNumber + 1)</label>
+    }
+    else
+    {
+        <a asp-action="ChapterbyNam" asp-controller="Chapters" asp-all-route-data=@(new Dictionary<string, string>() { { "chapNam", chapter.ChapterNumber.ToString() } ,{ "id", chapter.Id } });>@(chapter.ChapterNumber + 1)</a>
+    }
+}
+<br />
+<h4>Comments</h4>
+
+@if (comments.Count() != 0)
+{
+
+    @foreach (var comment in comments)
+    {
+
+
+        <td style="background-color: rgba(255, 255, 255, 0.5); color: black">
+            @comment.Text<br />
+            <strong><a href=@(Url.Action("UserAccount", "Account", new { id = comment.UserId }))>@userManager.FindByIdAsync(comment.UserId).Result.UserName</a></strong>
+            <em>(@comment.CommentDate.ToShortDateString() в @comment.CommentDate.ToShortTimeString())</em>
+        </td>
+
+        @if (signManager.IsSignedIn(User))
+        {
+            if (comment.UserId == user.Id || user.GetCurrentRole(userManager).Result == "Admin")
+            {
+                <td>
+                    <form method="post">
+                        <button type="submit" class="btn btn-danger" asp-action="DeleteComment" asp-controller="Chapters" asp-route-commentId=@comment.Id asp-route-chapterId=@Model.Id>Delete</button>
+                    </form>
+                </td>
+            }
+        }
+            <br />
+        }
+
+    }
+
+
+    <br />
+
+
+    @if (signManager.IsSignedIn(User))
+    {
+        <form asp-controller="Chapters" asp-action="AddComment" asp-route-chapterId="@Model.Id">
+            @Html.Partial("AddComment", new Comment())
+        </form>
+    }
+    <br />
+    <br />
+
+

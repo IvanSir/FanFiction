@@ -1,0 +1,83 @@
+﻿@inject Microsoft.AspNetCore.Identity.SignInManager<ApplicationUser> signManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <environment include="Development">
+        @{ ViewBag.Theme = Context.Request.Cookies["theme"]?.ToString();
+                        if (ViewBag.Theme == "dark")
+                        {
+            <link id="themeStyle" rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" /> }
+                        else
+                        {
+            <link id="themeStyle" rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-DarkTheme.css" /> } }
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FanFiction</a>
+                @*<button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>*@
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <partial name="_LoginPartial" />
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item ">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+
+                        @if (signManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Database">Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Fictions" asp-action="Create">Create</a>
+                            </li>
+                        }
+                            <li>
+                                <form class="form-inline" asp-action="Search" asp-controller="Fictions" method="get">
+                                    <input name="words" class="form-control m-sm-auto"
+                                           type="search" placeholder="Search" aria-label="Search">
+                                </form>
+                            </li>
+                        </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2020 - FanFiction - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy - </a>
+            @if (ViewBag.Theme == "dark")
+            {
+                <a class="fa-sun btn btn-info btn-xs" id="changeTheme" style="cursor: pointer">Сменить Тему</a> }
+            else
+            {
+                <a class="fa-moon btn btn-info btn-xs" id="changeTheme" style="cursor: pointer">Сменить Тему</a>}
+
+        </div>
+     
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="false"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

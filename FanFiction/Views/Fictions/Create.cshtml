@@ -1,0 +1,48 @@
+﻿@inject FanFiction.Data.ApplicationDbContext context
+@model CreateFictionModel
+@{ ViewBag.Title = "Create a Fiction"; }
+
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <h4>Create a new Fan Fiction.</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Fiction.Name"></label>
+                <input asp-for="Fiction.Name" class="form-control" />
+                <span asp-validation-for="Fiction.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Fiction.Description"></label>
+                <textarea id="description" asp-for="Fiction.Description" class="form-control"  style="margin: 0px; " rows="5" placeholder="Description"></textarea>
+                <style>
+                    textarea {
+                        resize: both;
+                        width: 200px;
+                        height: 200px;
+                    }
+                </style>
+                <span asp-validation-for="Fiction.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Fiction.Genre" class="col-md-2 control-label"></label>
+                <select asp-for="Fiction.Genre">
+                    <option disabled selected>Choose Genre</option>
+                    @foreach (var genre in context.Genres)
+                    {
+                        <option>@genre.GenreName</option>
+                    }
+                </select>
+                <span asp-validation-for="Fiction.Genre" class="text-danger" />
+            </div>
+            <div class="form-group">
+                <label>Tags</label>
+                <input name="tagName" class="form-control" />
+                <span asp-validation-for="Fiction.Tags" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+    </div>
+</div>
